@@ -17,7 +17,7 @@ import pl.com.bottega.ecommerce.sharedkernel.Money;
 
 public class BookKeeperTest {
 
-	public BookKeeper bookKeeper;
+	private BookKeeper bookKeeper;
 
 	@Test
 	public void testCase_1_DemandFactureWithOnePostition_ShouldReturnFactureWithOnePosition() {
@@ -85,5 +85,29 @@ public class BookKeeperTest {
 		Mockito.verify(taxPolicy, Mockito.times(2)).calculateTax(
 				productTypeEveryItem, moneyEveryItem);
 	}
+	
+	@Test
+		public void InvoiceRequestWithNoPosition_shouldReturnInvoiceWithNoPosition() {
+	
+			// given
+			Id id = new Id("2");
+			Money money = new Money(1);
+			InvoiceFactory mockInvoiceFactory = mock(InvoiceFactory.class);
+			bookKeeper = new BookKeeper(mockInvoiceFactory);
+			ClientData clientData = new ClientData(id, "client");
+			when(mockInvoiceFactory.create(clientData)).thenReturn(
+					new Invoice(id, clientData));
+			InvoiceRequest invoiceRequest = new InvoiceRequest(clientData);
+			TaxPolicy taxPolicy = mock(TaxPolicy.class);
+			when(taxPolicy.calculateTax(ProductType.FOOD, money)).thenReturn(
+					new Tax(money, "opis"));
+			ProductData productData = new ProductData(id, money, "ksiazka",
+					ProductType.FOOD, new Date());
+	
+			// when
+			Invoice invoice = bookKeeper.issuance(invoiceRequest, taxPolicy);
+					// then
+			assertThat(invoice.getItems().size(), is(0));
+		}
 	
 }
