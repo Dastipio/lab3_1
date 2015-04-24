@@ -24,7 +24,7 @@ public class BookKeeperTest {
 
 		Money money = new Money(20);
 		Id id = new Id("1");
-		ClientData clientData = new ClientData(id, "klient1");
+		ClientData clientData = new ClientDataBuilder().build();
 
 		BookKeeper book;
 
@@ -40,7 +40,7 @@ public class BookKeeperTest {
 		when(taxPolicy.calculateTax(ProductType.FOOD, money)).thenReturn(
 				new Tax(money, "opis"));
 
-		ProductData productData = new ProductDataBuilder().withPrice(10)
+		ProductData productData = new ProductDataBuilder().withPrice(1)
 				.withProductType(ProductType.FOOD).build();
 		RequestItem requestItem = new RequestItemBuilder()
 				.withProductData(productData).witTotalCost(10).build();
@@ -59,7 +59,7 @@ public class BookKeeperTest {
 		Id id = new Id("1");
 		Money moneyEveryItem = new Money(1);
 		ProductType productTypeEveryItem = ProductType.FOOD;
-		ClientData clientData = new ClientData(id, "client");
+		ClientData clientData = new ClientDataBuilder().build();
 		ProductData productData = new ProductDataBuilder().withPrice(10)
 				.withProductType(ProductType.FOOD).build();
 		RequestItem requestItem = new RequestItemBuilder()
@@ -69,9 +69,9 @@ public class BookKeeperTest {
 		bookKeeper = new BookKeeper(mockInvoiceFactory);
 		when(mockInvoiceFactory.create(clientData)).thenReturn(
 				new Invoice(id, clientData));
-		TaxPolicy taxPolicy = mock(TaxPolicy.class);
-		when(taxPolicy.calculateTax(productTypeEveryItem, moneyEveryItem))
-				.thenReturn(new Tax(moneyEveryItem, "content"));
+		when( mockInvoiceFactory.create( (ClientData) Mockito.any() ) ).thenReturn( new Invoice( Id.generate() , clientData ) );
+		TaxPolicy taxPolicy = mock( TaxPolicy.class );
+		when( taxPolicy.calculateTax( (ProductType)Mockito.any(), (Money)Mockito.any() ) ).thenReturn( new Tax( new Money( 0 ) , "" ) ); 
 
 		InvoiceRequest invoiceRequest = new InvoiceRequest(clientData);
 		invoiceRequest.add(requestItem);
@@ -93,14 +93,14 @@ public class BookKeeperTest {
 		Money money = new Money(1);
 		InvoiceFactory mockInvoiceFactory = mock(InvoiceFactory.class);
 		bookKeeper = new BookKeeper(mockInvoiceFactory);
-		ClientData clientData = new ClientData(id, "client");
+		ClientData clientData = new ClientDataBuilder().build();
 		when(mockInvoiceFactory.create(clientData)).thenReturn(
 				new Invoice(id, clientData));
 		InvoiceRequest invoiceRequest = new InvoiceRequest(clientData);
 		TaxPolicy taxPolicy = mock(TaxPolicy.class);
 		when(taxPolicy.calculateTax(ProductType.FOOD, money)).thenReturn(
 				new Tax(money, "opis"));
-		ProductData productData = new ProductDataBuilder().withPrice(2)
+		ProductData productData = new ProductDataBuilder().withPrice(11)
 				.withProductType(ProductType.FOOD).build();
 
 		// when
@@ -116,7 +116,7 @@ public class BookKeeperTest {
 		Id id = new Id("1");
 		Money moneyEveryItem = new Money(1);
 		ProductType productTypeEveryItem = ProductType.FOOD;
-		ClientData clientData = new ClientData(id, "client");
+		ClientData clientData = new ClientDataBuilder().build();
 		ProductData productData = new ProductDataBuilder().withPrice(1)
 				.withProductType(ProductType.FOOD).build();
 		RequestItem requestItem = new RequestItemBuilder()
